@@ -19,12 +19,12 @@ Steps:
 Paper Reference: Zhu, Xi, and Diansheng Guo. “Mapping Large Spatial Flow Data with Hierarchical Clustering.” Transactions in GIS 18, no. 3 (June 2014): 421–35. https://doi.org/10.1111/tgis.12100.
 
 How to use:
-    from algorithm.AFC import flow_cluster_afc_Zhu_and_Guo
+    from algorithm.AFC import flow_cluster_AFC
     OD = ...
     # to specify k manually
-    label = flow_cluster_afc_Zhu_and_Guo(OD, k=5) 
+    label = flow_cluster_AFC(OD, k=5) 
     # to determin k by the condition that at least 95% flows have 1 neighbor and at least 70% of flows have 7 neighbors.
-    label = flow_cluster_afc_Zhu_and_Guo(OD, k=None, determin_k_by_m=True, at_least_m=(1, 7), at_least_ratio=(0.95, 0.7)) 
+    label = flow_cluster_AFC(OD, k=None, determin_k_by_m=True, at_least_m=(1, 7), at_least_ratio=(0.95, 0.7)) 
 """
 
 from typing import Iterable, Optional, Union
