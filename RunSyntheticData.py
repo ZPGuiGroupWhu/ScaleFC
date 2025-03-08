@@ -46,6 +46,8 @@ all_data_algo_infos = {
                         other_func_kwargs=dict(eps=2.5, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.2, min_flows=4, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.2, min_flows=7, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
     ],
 
     "B": [
@@ -57,6 +59,8 @@ all_data_algo_infos = {
                         other_func_kwargs=dict(eps=1.6, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.2, min_flows=9, n_jobs=-1)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.2, min_flows=7, n_jobs=-1)),
     ],
 
     "C": [
@@ -68,6 +72,8 @@ all_data_algo_infos = {
                         other_func_kwargs=dict(eps=2.3, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.19, min_flows=5, n_jobs=-1)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.23, min_flows=5, n_jobs=-1)),
     ],
 
     "D": [
@@ -79,6 +85,8 @@ all_data_algo_infos = {
                         other_func_kwargs=dict(eps=4.5, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.24, min_flows=5, n_jobs=-1)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.24, min_flows=8, n_jobs=-1)),
     ],
 
     "E": [
@@ -90,6 +98,8 @@ all_data_algo_infos = {
                         other_func_kwargs=dict(eps=2.8, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.23, min_flows=5, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.24, min_flows=8, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
     ],
 
     "F": [
@@ -100,7 +110,9 @@ all_data_algo_infos = {
         ODAlgorithmInfo(name="FlowDBSCAN", func=flow_cluster_DBSCAN,
                         other_func_kwargs=dict(eps=3.8, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
-            scale_factor=0.21, min_flows=5, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
+            scale_factor=0.205, min_flows=5, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
+        ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
+            scale_factor=0.25, min_flows=6, n_jobs=-1, can_discard_flow_group_func=lambda x, y: len(x) < 8)),
     ],
 }
 
@@ -131,4 +143,4 @@ def run_four_algorithms(save=True):
 
 
 if __name__ == "__main__":
-    run_four_algorithms(save=False)
+    run_four_algorithms(save=True)
