@@ -35,7 +35,8 @@ def flow_cluster_ScaleFC(
     min_flows: int = 5,
     eps: Optional[float] = None,
     n_jobs: Optional[int] = None,
-    get_steps_time: bool = False, **kwargs
+    get_steps_time: bool = False, 
+    **kwargs
 ) -> np.ndarray[int]:
     """clustering by detecting prititioning flow for spatial-connected flow groups.
 

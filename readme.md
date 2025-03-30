@@ -13,7 +13,7 @@ The source code, data and figures for the paper: `ScaleFC: a scale-aware geograp
 
 The workflow of `ScaleFC`: 
 
-![workflow of ScaleFC](https://raw.githubusercontent.com/ZPGuiGroupWhu/ScaleFC/refs/heads/main/result/Fig4.png)
+![workflow of ScaleFC](https://raw.githubusercontent.com/ZPGuiGroupWhu/ScaleFC/refs/heads/main/Fig/Fig4.png)
 
 
 ## introduction
@@ -21,7 +21,7 @@ The workflow of `ScaleFC`:
 - The directory **algorithm** includes four flow clustering algorithms used in this paper, i.e., AFC, FlowLF, FlowDBSCAN and ScaleFC.  
 - The directory **data** includes the six synthetic datasets and the real-word bike-sharing OD data used in this paper.  
 - The directory **result** includes the results of comparative experiment, parameter analysis and validation tests.  
-- `Draw_flow.py` is used to draw the flow clustering results.  
+- `draw_flow.py` is used to draw the flow clustering results.  
 - `RunSyntheticData.py` is used to run the synthetic data experiment.  
 - `DrawFigures.ipynb` records the code used to draw the figures in the paper.  
 
@@ -144,6 +144,7 @@ real_label = np.loadtxt('DataA-label.txt', delimiter=',', dtype=int)
 - `impact_of_two_parameters.csv` is the result of ARI scores of the section impact of two parameters.   
 - `ScaleFC_each_step_time.csv` summarizes the time of each step of ScaleFC.  
 - `ScaleFC-para-nonpara-time.csv` stores the execuation time of ScaleFC with and without parallel computing.  
-- `synthetic_clustering_resuls.csv` is the result of four algorithms on synthetic datasets.  
+- `synthetic_clustering_resuls.csv` is the result of four algorithms on synthetic datasets.
+- `synthetic_clustering_resuls_with_sf_and_FDS.csv` is the result of four algorithms on synthetic datasets with scale factor and *Flow Dissimilarity* metric. 
 - `time-complexity-500-5000-100-xxxx.csv` stores the time complexity of four methods on datasets of varying size (small-scale).    
 - `time-complexity-5500-20000-500-xxxx.csv` stores the time complexity of four methods on datasets of varying size (large-scale).  

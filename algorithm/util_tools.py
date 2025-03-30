@@ -3,6 +3,24 @@ import numpy as np
 from sklearn.metrics import pairwise_distances
 from sklearn.neighbors import NearestNeighbors
 
+__all__ = [
+    "flow_OD_points",
+    "flow_check_OD",
+    "flow_number",
+    "flow_length",
+    "flow2vector",
+    "flow_angle",
+    "flow_centroid_OD",
+    "flow_distance_other_flow_matrix_max_euclidean",
+    "flow_distance_matrix_max_euclidean",
+    "flow_distance_other_flow_matrix_weighted_with_length",
+    "flow_distance_matrix_weighted_with_length",
+    "point_knn",
+    "point_knn_search_by_point",
+    "clusters_relabel_by_number_of_each_subcluster",
+    "flow_kth_nearest_neighbor_distance",
+    "kth_nearest_neighbor_distance"
+]
 
 ######################################### FLOW ATTRIBUTES #################################
 
@@ -88,6 +106,26 @@ def flow_distance_other_flow_matrix_max_euclidean(OD1, OD2):
 def flow_distance_matrix_max_euclidean(OD):
     return flow_distance_other_flow_matrix_max_euclidean(OD, OD)
 
+def flow_distance_other_flow_matrix_weighted_with_length(
+    OD1: np.ndarray, OD2: np.ndarray, origin_weight: float = 1.0, dest_weight=1.0, length_power: int = 1, metric: str = 'euclidean'
+) -> np.ndarray:
+    assert origin_weight > 0 and dest_weight > 0, f"Invalid weight, origin_weight:{origin_weight}, dest_weight:{dest_weight}"
+
+    op_dis, dp_dis = _flow_O_points_dis_and_D_points_dis(OD1, metric, OD2)
+    op_dis = np.square(op_dis)
+    dp_dis = np.square(dp_dis)
+    length1 = flow_length(OD1)
+    if OD2 is None:
+        length2 = length1
+    else:
+        length2 = flow_length(OD2)
+    length = np.outer(length1, length2) ** length_power
+    d = (origin_weight * op_dis + dest_weight * dp_dis) / (length + 1e-10)
+    return np.sqrt(d)
+
+# flow distance used in Tao et al. (2016/2019)
+def flow_distance_matrix_weighted_with_length(OD):
+    return flow_distance_other_flow_matrix_weighted_with_length(OD, None, origin_weight=1, dest_weight=1, length_power=1, metric='euclidean')
 
 ######################################### MISC FUNCTION #################################
 

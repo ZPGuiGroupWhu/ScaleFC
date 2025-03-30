@@ -31,6 +31,8 @@ from typing import Iterable, Optional, Union
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.neighbors import NearestNeighbors
+from scipy.sparse import csr_matrix
 from algorithm.util_tools import *
 
 
@@ -85,15 +87,8 @@ def flow_cluster_AFC(
                 f"determin_k_by_m is True, k={k} will not take effect and it will be determined by at_least_m and at_least_ratio setting.")
         k = _afc_determine_k_from_m_dist(
             OD, at_least_m, at_least_ratio, n_jobs, batch_size)
-        # _log.info(f"The determined k is {k}.")
 
-    op, dp = flow_OD_points(OD)
-    # 首先找到O点的knn
-    op_knn_indices = point_knn(op, k)
-    # 然后找到D点的knn
-    dp_knn_indices = point_knn(dp, k)
-    dm = _afc_flow_distance(
-        op_knn_indices, dp_knn_indices, k, n_jobs, batch_size)
+    dm = _snn(OD, k)
 
     label = AgglomerativeClustering(
         n_clusters=None, linkage='complete', metric="precomputed", distance_threshold=1).fit_predict(dm)
@@ -106,54 +101,29 @@ def flow_cluster_AFC(
             return label, origin_label
     return label
 
+def _knn_intersection_matrix(points, k):
 
-def _afc_flow_distance(op_knn_indices, dp_knn_indices, k: int, n_jobs=None, batch_size=100) -> np.ndarray:
-    n_samples = len(op_knn_indices)
-    dist = np.zeros((n_samples, n_samples))
+    # 计算 KNN（排除自身）
+    nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='auto', n_jobs=-1).fit(points)
+    _, indices = nbrs.kneighbors(points)
+    knn_indices = indices[:, 1:]  # 移除第一个元素（自身）
 
-    if n_jobs:
-        assert isinstance(n_jobs, int), f"n_jobs must be int, but got {n_jobs}"
+    # 构建稀疏邻接矩阵
+    N = points.shape[0]
+    rows = np.repeat(np.arange(N), k)
+    cols = knn_indices.ravel()
+    adj = csr_matrix((np.ones_like(rows), (rows, cols)), shape=(N, N), dtype=np.int32)
 
-        def compute_batch(batch):
-            batch_results = []
-            for i, j in batch:
-                op_intersec = np.intersect1d(
-                    op_knn_indices[i], op_knn_indices[j], assume_unique=True)
-                dp_intersec = np.intersect1d(
-                    dp_knn_indices[i], dp_knn_indices[j], assume_unique=True)
-                snn = 1 - len(op_intersec) * len(dp_intersec) / k / k
-                batch_results.append((i, j, snn))
-            return batch_results
+    # 矩阵乘法计算交集数量 (利用稀疏矩阵优化)
+    intersection = adj.dot(adj.T)
 
-        # 生成 (i, j) 对的批次
-        pairs = [(i, j) for i in range(n_samples)
-                 for j in range(i + 1, n_samples)]
-        batches = [pairs[i: i + batch_size]
-                   for i in range(0, len(pairs), batch_size)]
+    # 转换为密集数组并对称化
+    return (intersection + intersection.T).toarray() // 2  # 消除重复计数
 
-        # 使用joblib并行化批次计算
-        results = Parallel(n_jobs=n_jobs)(
-            delayed(compute_batch)(batch) for batch in batches)
 
-        # 展开结果并填充dist矩阵
-        for batch_results in results:
-            for i, j, snn in batch_results:
-                dist[i, j] = snn
-                dist[j, i] = snn
-
-        return dist
-    else:
-        for i in range(n_samples):
-            for j in range(i + 1, n_samples):
-                op_intersec = np.intersect1d(
-                    op_knn_indices[i], op_knn_indices[j], assume_unique=True)
-                dp_intersec = np.intersect1d(
-                    dp_knn_indices[i], dp_knn_indices[j], assume_unique=True)
-                snn = 1 - len(op_intersec) * len(dp_intersec) / k / k
-                dist[i, j] = snn
-                dist[j, i] = snn
-        return dist
-
+def _snn(OD, k):
+    op,dp = flow_OD_points(OD)
+    return 1 - _knn_intersection_matrix(op, k) * _knn_intersection_matrix(dp, k) / k / k
 
 def _afc_flow_knn_length(OD, k, n_jobs=None, batch_size=100) -> list:
     op, dp = flow_OD_points(OD)

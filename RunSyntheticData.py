@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Callable
 import pandas as pd
 from sklearn import metrics
+import numpy as np
 
 
 
@@ -58,7 +59,7 @@ all_data_algo_infos = {
         ODAlgorithmInfo(name="FlowDBSCAN", func=flow_cluster_DBSCAN,
                         other_func_kwargs=dict(eps=1.6, min_flows=5, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
-            scale_factor=0.2, min_flows=9, n_jobs=-1)),
+            scale_factor=0.205, min_flows=9, n_jobs=-1)),
         ODAlgorithmInfo(name="ScaleFC (Adapted)", func=flow_cluster_ScaleFC, other_func_kwargs=dict(
             scale_factor=0.2, min_flows=7, n_jobs=-1)),
     ],

@@ -18,7 +18,10 @@ How to use:
     labels = flow_cluster_LF(OD, radius_low=1, radius_high=5, radius_step=0.1, significance=0.05, MonteCarloTest_times=199)
 """
 
+from collections import deque
+from sklearn.metrics import pairwise_distances
 from algorithm.util_tools import *
+from algorithm.ScaleFC import _scale_factor_func_linear
 import numpy as np
 from typing import Any, Callable, Generator, Iterable, Optional, Union
 from joblib import Parallel, delayed
@@ -406,3 +409,81 @@ def flow_Ripley_local_HFunction_MonteCarloTest(
         radius_order=radius_order,
         n_jobs=n_jobs,
     )
+
+
+# --------------------------------------------------------------------------
+
+# 封装蒙特卡洛模拟的单次迭代
+
+
+def flow_cluster_LF_with_scale_factor(OD: np.ndarray, scale_factor: float, significance: float = 0.1, MonteCarloTest_times: int = 199, n_jobs: Optional[int] = None, **kwargs):
+    N = flow_number(OD)
+    if (flow_distance_func := kwargs.get("flow_distance_func")) is None:
+        flow_distance_func = flow_distance_matrix_max_euclidean
+
+    if (flow_distance_other_flow_func := kwargs.get("flow_distance_other_flow_func")) is None:
+        flow_distance_other_flow_func = flow_distance_other_flow_matrix_max_euclidean
+    min_num_of_subcluster = kwargs.get("min_num_of_subcluster", 5)
+    assert isinstance(min_num_of_subcluster, int) and min_num_of_subcluster > 0, f"min_num_of_subcluster must be greater than 0"
+        
+    distance_matrix = flow_distance_func(OD)
+    eps_array = _scale_factor_func_linear(OD, scale_factor)
+    # print(f"eps array is {eps_array}")
+    # 这里是观测到的每个邻居的数量
+    x = np.count_nonzero(distance_matrix <= eps_array, axis=1)
+    # assert len(x) == N and x.size == N
+    # 使用 joblib 并行执行蒙特卡洛模拟
+    def monte_carlo_iteration():
+        newOD = next(flow_shuffle_from_OPoints_and_DPoints(OD, 1))
+        newdm = flow_distance_other_flow_func(OD, newOD)
+        neweps = _scale_factor_func_linear(newOD, scale_factor)
+        newx = np.count_nonzero(newdm <= neweps, axis=1)
+        return (x >= newx).astype(int)
+    results = Parallel(n_jobs=n_jobs, backend='threading')(
+        delayed(monte_carlo_iteration)()
+        for _ in range(MonteCarloTest_times)
+    )
+    # 对结果进行累加
+    res = np.ones(N)
+    for result in results:
+        res += result
+    
+    # print(res)
+    high =  (MonteCarloTest_times + 1) - ((MonteCarloTest_times + 1) * significance // 2)
+    
+    # 找出res中大于等于high的索引，我要的是索引的序号
+    core_flow_indices = np.where(res >= high)[0]
+    
+    label = np.full(N, fill_value=-1)
+    if len(core_flow_indices) == 0:
+        return label
+
+    # BFS遍历
+    n = len(core_flow_indices)
+    visited = np.full(n, False)
+    groups = []
+
+    for i, item in enumerate(core_flow_indices):
+        if not visited[i]:
+            group = []
+            dq = deque()
+            dq.append(item)
+            visited[i] = True
+            while dq:
+                node = dq.popleft()
+                group.append(node)
+                for i2, item2 in enumerate(core_flow_indices):
+                    if not visited[i2] and (distance_matrix[node, item2] <= eps_array[node] or distance_matrix[item2, node] <= eps_array[item2]):
+                        dq.append(item2)
+                        visited[i2] = True
+
+            groups.append(np.asarray(group, dtype=int))
+
+    for idx, gg in enumerate(groups):
+        label[gg] = idx
+    label = clusters_relabel_by_number_of_each_subcluster(label, min_num_of_subcluster)
+    return label
+     
+     
+    
+    
