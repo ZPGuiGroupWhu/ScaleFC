@@ -127,7 +127,7 @@ def flow_cluster_LF(
     assert observed_res.shape[0] == test_res.shape[
         0], f"Invalid test_res: {test_res.shape}, observed_res: {observed_res.shape}"
     num_radius = test_res.shape[0]
-    # 目前先只支持一个radius，而不是数组
+    # Currently only supports one radius, not an array
     assert num_radius == 1, f"Invalid radius, is must be float or int: {test_res.shape}"
     num_OD = flow_number(OD)
     label = np.full(num_OD, -1)
@@ -140,7 +140,7 @@ def flow_cluster_LF(
 
     if link_by_radius:
         idxx = label == 0
-        # 按照最小距离的原理连接类簇
+        # Connecting clusters based on the principle of minimum distance
         new_label = AgglomerativeClustering(n_clusters=None, linkage='single', metric="precomputed",
                                             distance_threshold=radius).fit_predict(OD_distance_matrix[idxx][:, idxx])
         label[idxx] = new_label
@@ -151,8 +151,7 @@ def flow_cluster_LF(
             if return_origin_label:
                 return label, origin_label
         else:
-            print(
-                f"min_num_of_subcluster is None or 0, will generate subclusters with few flows.")
+            print("min_num_of_subcluster is None or 0, will generate subclusters with few flows.")
 
     return label
 
@@ -206,7 +205,7 @@ def Ripley_LFunction_local_base(
 
 def Ripley_KFunction_local_base(distance_matrix: np.ndarray, lambda_: float, radius: Union[float, int, np.ndarray], is_baised: bool = True, minus_one: bool = True) -> np.ndarray:
     assert np.ndim(
-        distance_matrix) == 2, f"Invalid distance similarity matrix: shape error."
+        distance_matrix) == 2, "Invalid distance similarity matrix: shape error."
 
     n = len(distance_matrix)
     # assert n == m, f"Invalid distance similarity matrix-shape: dim error."
@@ -278,10 +277,10 @@ def _inner_Ripley_KLH_Function_determin_best_radius(
     ii = max_arg[0]
     right_ag = ag[ii:]
 
-    # 全局K/L/H函数最大值右侧的第一个极小值
+    # The first local minimum to the right of the global maximum of the K/L/H function
     if len(right_ag) > 1:
         dif = np.diff(right_ag)
-        # 导数为正数的第一个地方,没有的话，就是最大值那里
+        # The first point where the derivative is positive; if none, then at the maximum point
         newii = np.where(dif > 0)[0]
         if newii.size > 0:
             newii = newii[0]
@@ -318,7 +317,7 @@ def Ripley_KFunction_global_base(
     return np.sum(res, axis=0)
 
 
-# 得到一个times X data_number(data) X len(radius)的矩阵，使用蒙特卡洛模拟估计参数
+# Obtain a matrix of dimensions times X data_number(data) X len(radius), using Monte Carlo simulation to estimate parameters
 def _inner_Ripley_local_KLH_Function_MonteCarloTest(
     data: np.ndarray, n_jobs: int, times: int, shuffle_data_func: Callable, distance_matrix_func: Callable, Ripley_local_func: Callable, **Ripley_local_func_kwargs
 ):
@@ -413,9 +412,6 @@ def flow_Ripley_local_HFunction_MonteCarloTest(
 
 # --------------------------------------------------------------------------
 
-# 封装蒙特卡洛模拟的单次迭代
-
-
 def flow_cluster_LF_with_scale_factor(OD: np.ndarray, scale_factor: float, significance: float = 0.1, MonteCarloTest_times: int = 199, n_jobs: Optional[int] = None, **kwargs):
     N = flow_number(OD)
     if (flow_distance_func := kwargs.get("flow_distance_func")) is None:
@@ -429,10 +425,10 @@ def flow_cluster_LF_with_scale_factor(OD: np.ndarray, scale_factor: float, signi
     distance_matrix = flow_distance_func(OD)
     eps_array = _scale_factor_func_linear(OD, scale_factor)
     # print(f"eps array is {eps_array}")
-    # 这里是观测到的每个邻居的数量
+    # Here is the observed number of each neighbor
     x = np.count_nonzero(distance_matrix <= eps_array, axis=1)
     # assert len(x) == N and x.size == N
-    # 使用 joblib 并行执行蒙特卡洛模拟
+    # Parallel Execution of Monte Carlo Simulation Using joblib
     def monte_carlo_iteration():
         newOD = next(flow_shuffle_from_OPoints_and_DPoints(OD, 1))
         newdm = flow_distance_other_flow_func(OD, newOD)
@@ -443,7 +439,7 @@ def flow_cluster_LF_with_scale_factor(OD: np.ndarray, scale_factor: float, signi
         delayed(monte_carlo_iteration)()
         for _ in range(MonteCarloTest_times)
     )
-    # 对结果进行累加
+    # Accumulate the results
     res = np.ones(N)
     for result in results:
         res += result
@@ -451,14 +447,14 @@ def flow_cluster_LF_with_scale_factor(OD: np.ndarray, scale_factor: float, signi
     # print(res)
     high =  (MonteCarloTest_times + 1) - ((MonteCarloTest_times + 1) * significance // 2)
     
-    # 找出res中大于等于high的索引，我要的是索引的序号
+    # Find the indices in res that are greater than or equal to high, I want the index numbers
     core_flow_indices = np.where(res >= high)[0]
     
     label = np.full(N, fill_value=-1)
     if len(core_flow_indices) == 0:
         return label
 
-    # BFS遍历
+    # BFS
     n = len(core_flow_indices)
     visited = np.full(n, False)
     groups = []

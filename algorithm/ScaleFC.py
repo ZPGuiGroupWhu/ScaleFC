@@ -167,7 +167,7 @@ def flow_cluster_ScaleFC(
     # _log.debug(f"subgroups_indices_queue length: {len(subgroups_indices_queue)}")
 
     tt2 = time.time()
-    steps_time[0] += tt2 - tt1  # 第一步的时间
+    steps_time[0] += tt2 - tt1  # The time of the first step
 
     # use parallel or not, cannot use _log in parallel
     if not n_jobs:
@@ -180,18 +180,18 @@ def flow_cluster_ScaleFC(
             if can_discard_flow_group_func(current_flow_group, *can_discard_flow_group_func_args):
                 # _log.debug(f"discard current flow group - current_indices: {current_indices}")
                 tt2 = time.time()
-                steps_time[1] += tt2 - tt1  # 第二步骤的时间
+                steps_time[1] += tt2 - tt1  #
                 continue
 
             if is_strong_flow_group_func(current_flow_group, *is_strong_flow_group_func_args):
                 result_subclusters_indices.append(current_indices)
                 # _log.debug(f"save current strong-connected flow group - current_indices: {current_indices}")
                 tt2 = time.time()
-                steps_time[1] += tt2 - tt1  # 第二步骤的时间
+                steps_time[1] += tt2 - tt1  #
                 continue
 
             tt2 = time.time()
-            steps_time[1] += tt2 - tt1  # 第二步骤的时间
+            steps_time[1] += tt2 - tt1  #
 
             # find pf and partition current flow group
             l, r, pf_idx = _flow_partition_arg(
@@ -231,7 +231,7 @@ def flow_cluster_ScaleFC(
                     f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - DEBUG - [flow_cluster_dpfscf] - discard current flow group - current_indices: {current_indices}"
                 )
                 tt2 = time.time()
-                # steps_time[1] += tt2 - tt1 # 第二步骤的时间
+                # steps_time[1] += tt2 - tt1 
                 return (None, None, tt2 - tt1)
 
             if is_strong_flow_group_func(current_flow_group, *is_strong_flow_group_func_args):
@@ -239,11 +239,10 @@ def flow_cluster_ScaleFC(
                     f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - DEBUG - [flow_cluster_dpfscf] - save current strong-connected flow group - current_indices: {current_indices}"
                 )
                 tt2 = time.time()
-                # steps_time[1] += tt2 - tt1 # 第二步骤的时间
+                # steps_time[1] += tt2 - tt1 
                 return (current_indices, None, tt2-tt1)
 
             tt2 = time.time()
-            # steps_time[1] += tt2 - tt1 # 第二步骤的时间
 
             # find pf and partition current flow group
             l, r, pf_idx = _flow_partition_arg(
@@ -266,7 +265,6 @@ def flow_cluster_ScaleFC(
             pf_index = current_indices[pf_idx] if pf_idx else None
 
             tt3 = time.time()
-            # steps_time[2] += tt3 - tt2 # 第三步骤的时间
 
             return (None, (left_indices, right_indices, pf_index), tt2-tt1, tt3-tt2)
 
@@ -279,7 +277,7 @@ def flow_cluster_ScaleFC(
                 for result in results:
                     if result[0] is not None:
                         result_subclusters_indices.append(result[0])
-                        # 只有第二步骤的时间
+                        # 
                         steps_time[1] += result[2]
 
                     if result[1] is not None:
@@ -291,9 +289,9 @@ def flow_cluster_ScaleFC(
                         if pf_index is not None:
                             all_pf_indices.append(pf_index)
 
-                        steps_time[1] += result[2]  # 第二步都有
+                        steps_time[1] += result[2]  # 
                         if len(result) == 4:
-                            steps_time[2] += result[3]  # 第三步的加上都有
+                            steps_time[2] += result[3]  # 
 
     tt3 = time.time()
     labels = np.full(OD_len, fill_value=-1, dtype=int)
@@ -347,35 +345,35 @@ def flow_cluster_ScaleFC(
 
 
 def flow_indicator_rmse_OD_distance(OD: np.ndarray) -> float:
-    # 1. 计算中心流
+    # 1. Calculate the centroid flow
     centroid_flow = flow_centroid_OD(OD)
 
     number = flow_number(OD)
-    # 2. 计算每条流到中心流之间的距离
+    # 2. Calculate the distance between each flow and the centroid flow
     max_dist = flow_distance_other_flow_matrix_max_euclidean(centroid_flow, OD)
     # print(max_dist.shape)
-    # 3. 计算出最终的值
+    # 3. Calculate the final value
     res = np.sqrt(np.sum(np.square(max_dist)) / number)
     return res
 
 
 def flow_indicator_rmse_length(OD):
-    # 1. 计算中心流
+    # 1. Calculate the centroid flow
     centroid_flow = flow_centroid_OD(OD)
     number = flow_number(OD)
-    # 2. 计算每条流和中心流的距离
+    # 2. Calculate the distance between each flow and the centroid flow
     cl = flow_length(centroid_flow)
     od_len = flow_length(OD)
-    # 3. 计算出最终的值
+    # 3. Calculate the final value
     res = np.sqrt(np.sum(np.square(od_len - cl)) / number)
     return res
 
 
 def flow_indicator_rmse_angle(OD) -> float:
-    # 1. 计算中心流
+    # 1. Calculate the centroid flow
     centroid_flow = flow_centroid_OD(OD)
     number = flow_number(OD)
-    # 2. 计算每条流到中心流之间的夹角
+    # 2. Calculate the angle between each flow and the centroid flow
     c_v = flow2vector(centroid_flow)
     # print(c_v)
     od_v = flow2vector(OD)
@@ -384,21 +382,21 @@ def flow_indicator_rmse_angle(OD) -> float:
     cos_s = pro / flow_length(centroid_flow) / flow_length(OD)
     cos_s = np.where(cos_s > 1, 1, np.where(cos_s < -1, -1, cos_s))
     res = np.arccos(cos_s)
-    # 3. 计算出最终的值
+    # 3. Calculate the final value
     return np.sqrt(np.sum(np.square(res)) / number)
 
-# 三个值的理论最大值
+# The theoretical maximum values of three values
 
 
 def _rmse_max_dis_len_angle(OD, r):
-    # 1. 计算中心流
+    # 1. Calculate the centroid flow
     centroid_flow = flow_centroid_OD(OD)
-    # 2. 中心流长
+    # 2. Centroid flow length
     cl = flow_length(centroid_flow)
     return r, 2 * r, np.arcsin(2 * r / cl) if 2 * r <= cl else 0.00001
 
 
-# 计算F是否为强连接簇，r是邻域
+# Calculate whether F is a strong connected cluster, r is the neighborhood
 def _is_strong_flow_group_with_fixed_eps(OD: np.ndarray, eps: float) -> bool:
     AM, BM, CM = _rmse_max_dis_len_angle(OD, eps)
     A = flow_indicator_rmse_OD_distance(OD)
@@ -465,18 +463,18 @@ def _is_strong_connected_cluster_with_scale_factor(
     scale_factor_func: Union[Literal["linear", "square", "sqrt", "tanh"], Callable[[
         np.ndarray, float], np.ndarray]] = _scale_factor_func_linear,
 ) -> bool:
-    # 1. 计算中心流
+    # 1. Calculate the centroid flow
     centroid_flow = flow_centroid_OD(OD)
-    # 2. 中心流长
+    # 2. Centroid flow length
     f = _check_scale_factor_func(scale_factor_func)
     r = f(centroid_flow, scale_factor)
     return _is_strong_flow_group_with_fixed_eps(OD, r)
 
 
-# 密度连接的过程
-# 1. 首先找出所有核心流
-# 2. 根据定义剔除部分核心流
-# 3. 根据密度连接机制合并，更改标签
+# The process of density connection
+# 1. First find all core flows
+# 2. According to the definition, exclude some core flows
+# 3. Merge according to the density connection mechanism and change the label
 def flow_label_spatial_connected_groups_with_eps(OD_distance_matrix: np.ndarray, eps: Union[float, list, tuple, np.ndarray] = 0.5, min_flows: int = 5) -> np.ndarray[int]:
     lens = len(OD_distance_matrix)
 
@@ -490,7 +488,7 @@ def flow_label_spatial_connected_groups_with_eps(OD_distance_matrix: np.ndarray,
 
     assert min_flows > 0 and np.all(eps > 0), "Invalid params!"
     dm = OD_distance_matrix
-    # 寻找核心流
+    # Find core flows
     x = np.count_nonzero(dm <= eps, axis=1)
     core_flow_indices = np.where(x >= min_flows)[0]
 
@@ -503,7 +501,7 @@ def flow_label_spatial_connected_groups_with_eps(OD_distance_matrix: np.ndarray,
     if len(core_flow_indices) == 0:
         return label
 
-    # BFS遍历
+    # BFS traversal
     n = len(core_flow_indices)
     visited = np.full(n, False)
     groups = []
@@ -529,8 +527,8 @@ def flow_label_spatial_connected_groups_with_eps(OD_distance_matrix: np.ndarray,
     return label
 
 
-# 这个版本引入尺度因子再计算得到密度连接簇
-# 也就是每个r都等于0.5 * alpha * l
+# This version introduces the scale factor to calculate the density connected cluster
+# That is, each r equals 0.5 * alpha * l
 def flow_label_spatial_connected_groups_with_scale_factor(
     OD: np.ndarray,
     scale_factor: float = 0.1,
@@ -548,7 +546,7 @@ def flow_label_spatial_connected_groups_with_scale_factor(
     return res
 
 
-# 计算FKI
+# Calculate FKI
 def _flow_calculate_FKI(
     OD: np.ndarray, flow_distance_func: Callable[[np.ndarray], np.ndarray], k: int, calc_FKI_func: Callable[[np.ndarray], float], n_jobs: Optional[int] = None
 ) -> list[float]:
@@ -598,21 +596,21 @@ def _flow_calculate_FKI(
         return KFI_res
 
 
-# 请确保输入的FKI必须要是有序的
-# 返回的数组要么等长，要么长度差一
+# Ensure that the input FKI must be ordered
+# The returned array is either the same length or one less
 # (FKI2 - FKI1) / FKI1
 def _calculate_FKID(FKI: list) -> list[float]:
     FKI = np.asarray(FKI)
     if len(FKI) < 2:
         return []
 
-    # 计算 (FKI[1:] - FKI[:-1]) / FKI[:-1]
+    # Calculate (FKI[1:] - FKI[:-1]) / FKI[:-1]
     derivative = np.abs((FKI[1:] - FKI[:-1]) / FKI[:-1])
 
     return derivative
 
 
-# 找到分割流的索引
+# Find the index of the partitioning flow
 def _flow_find_partitioningflow_arg(rearrange_arg: list, FKI: list, calc_FKID_func: Callable[[list], list]) -> int:
     if len(FKI) < 3:
         pf_idx = rearrange_arg[0]
@@ -629,7 +627,7 @@ def _flow_find_partitioningflow_arg(rearrange_arg: list, FKI: list, calc_FKID_fu
     return pf_idx
 
 
-# 返回左右子簇的索引
+# Return the indices of the left and right subclusters
 def _flow_get_left_right_indices_by_pf(rearrange_arg, pf_idx: int) -> tuple[list[int], list[int]]:
     assert pf_idx in rearrange_arg
     if not isinstance(rearrange_arg, list):
@@ -659,7 +657,7 @@ def _flow_rearrange_indices(OD: np.ndarray) -> list[int]:
 
     return res[cf_index + 1:] + res[:cf_index]
 
-# 返回分割后的左、右子簇的索引
+# Return the indices of the left and right subclusters after partitioning
 
 
 def _flow_partition_arg(
@@ -670,18 +668,18 @@ def _flow_partition_arg(
     calc_FKID_func: Callable[[list], list],
     n_jobs: Optional[int] = None,
 ) -> tuple[list[int], list[int], int]:
-    # 1. 重新排序
+    # 1. Rearrange
     new_idx = _flow_rearrange_indices(OD)
-    # 2. 计算FKI
+    # 2. Calculate FKI
     FKI = _flow_calculate_FKI(OD, flow_distance_func,
                               k, calc_FKI_func, n_jobs=n_jobs)
     if 0 in FKI:
         FKI = [x + 1 for x in FKI]
         # _log.warning_once(
         #     "There are some FKI equals to 0, so we add 1 to them.")
-    # 3. 计算寻找pf
+    # 3. Find pf
     pf_idx = _flow_find_partitioningflow_arg(new_idx, FKI, calc_FKID_func)
 
-    # 4. 获得左右的索引
+    # 4. Get the indices of left and right
     l, r = _flow_get_left_right_indices_by_pf(new_idx, pf_idx)
     return l, r, pf_idx

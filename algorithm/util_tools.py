@@ -177,7 +177,6 @@ def kth_nearest_neighbor_distance(distance_matrix: np.ndarray, k: int = 5, retur
     else:
         raise TypeError("k must be an integer or an iterable of integers.")
     nn = NearestNeighbors(n_neighbors=use_k, metric="precomputed", algorithm='auto', n_jobs=-1).fit(distance_matrix)
-    # 返回的距离是排序的第k个
     dis, idx = nn.kneighbors()
     sls = (slice(None), k - 1)
     # print(return_index)

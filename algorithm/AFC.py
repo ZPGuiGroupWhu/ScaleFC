@@ -103,23 +103,22 @@ def flow_cluster_AFC(
 
 def _knn_intersection_matrix(points, k):
 
-    # 计算 KNN（排除自身）
+    # Calculate KNN (excluding itself)
     nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='auto', n_jobs=-1).fit(points)
     _, indices = nbrs.kneighbors(points)
-    knn_indices = indices[:, 1:]  # 移除第一个元素（自身）
+    knn_indices = indices[:, 1:]  # Remove the first element (self)
 
-    # 构建稀疏邻接矩阵
+    # Build sparse adjacency matrix
     N = points.shape[0]
     rows = np.repeat(np.arange(N), k)
     cols = knn_indices.ravel()
     adj = csr_matrix((np.ones_like(rows), (rows, cols)), shape=(N, N), dtype=np.int32)
 
-    # 矩阵乘法计算交集数量 (利用稀疏矩阵优化)
+    # Calculate intersection count using matrix multiplication (optimized with sparse matrices)
     intersection = adj.dot(adj.T)
 
-    # 转换为密集数组并对称化
-    return (intersection + intersection.T).toarray() // 2  # 消除重复计数
-
+    # Convert to dense array and symmetrize
+    return (intersection + intersection.T).toarray() // 2  # Eliminate duplicate counts
 
 def _snn(OD, k):
     op,dp = flow_OD_points(OD)
@@ -141,16 +140,16 @@ def _afc_flow_knn_length(OD, k, n_jobs=None, batch_size=100) -> list:
                 batch_results.append(intersec.size)
             return batch_results
 
-        # 生成批次索引
+        # Generate batch indices
         indices = list(range(len(op_knn_indices)))
         batches = [indices[i: i + batch_size]
                    for i in range(0, len(indices), batch_size)]
 
-        # 使用 joblib 进行并行计算
+        # Perform parallel computation using joblib
         flow_knn_indices_length = Parallel(n_jobs=n_jobs)(
             delayed(compute_batch)(batch) for batch in batches)
 
-        # 展开结果
+        # Flatten results
         flow_knn_indices_length = [
             item for sublist in flow_knn_indices_length for item in sublist]
 
@@ -165,9 +164,10 @@ def _afc_flow_knn_length(OD, k, n_jobs=None, batch_size=100) -> list:
         return flow_knn_indices_length
 
 
-# 根据 m 来推定 k
-# 比如：at_least_m = 5, at_least_ratio=0.95 表示至少有 95% 的流有 5 个邻居，输出此时最小的 k
-# at_least_m = [5, 1], at_least_ratio=[0.7, 0.95]， 表示至少有 95% 的流有 1 个邻居；并且至少有 70% 的流有 1 个邻居，输出此时最小的 k
+# Estimate k based on m
+# Example: at_least_m = 5, at_least_ratio=0.95 means at least 95% of flows have 5 neighbors, output the smallest k
+# at_least_m = [5, 1], at_least_ratio=[0.7, 0.95], means at least 95% of flows have 1 neighbor; and at least 70% of flows have 1 neighbor, output the smallest k
+
 def _afc_determine_k_from_m_dist(OD: np.ndarray, at_least_m, at_least_ratio, n_jobs, batch_size) -> int:
     N = flow_number(OD)
     at_least_neighbors = tuple(int(x * N) for x in at_least_ratio)
@@ -192,7 +192,7 @@ def _afc_determine_k_from_m_dist(OD: np.ndarray, at_least_m, at_least_ratio, n_j
             high = 2 * high
             k = high
 
-    # 现在来寻找最小的k
+    # Now find the minimal k
     while low < high:
         mid = (low + high) // 2
         if _helper_this_k_is_ok(mid):
@@ -209,3 +209,26 @@ def _afc_determine_k_from_m_dist(OD: np.ndarray, at_least_m, at_least_ratio, n_j
         msg += f"{ccount}. At least {100 * y:.2f}% flow(s) have {x} neighbor(s). "
     # _log.debug(msg)
     return k
+
+# Extend to both sides
+def flow_extension(OD: np.ndarray, od_ex_len: float, do_ex_len: float, copy=True) -> np.ndarray:
+    if copy:
+        OD = np.copy(OD)
+    ox = OD[:, 0]
+    oy = OD[:, 1]
+    dx = OD[:, 2]
+    dy = OD[:, 3]
+
+    ang = flow_angle(OD)
+    dx += od_ex_len * np.cos(ang)
+    dy += od_ex_len * np.sin(ang)
+
+    ox -= do_ex_len * np.cos(ang)
+    oy -= do_ex_len * np.sin(ang)
+
+    OD[:, 0] = ox
+    OD[:, 1] = oy
+    OD[:, 2] = dx
+    OD[:, 3] = dy
+
+    return OD

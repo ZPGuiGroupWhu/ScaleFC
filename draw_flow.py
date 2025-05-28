@@ -31,7 +31,7 @@ __all__ = [
 
 _my_color_map = MappingProxyType(
     {
-        # 默认的
+        # Default
         "default": (
             'brown',
             'coral',
@@ -64,44 +64,40 @@ _my_color_map = MappingProxyType(
             'blue',
             'red',
         ),
-        # 复古
         "vintage": ('#0780cf', '#765005', '#fa6d1d', '#0e2c82', '#b6b51f', '#da1f18', '#701866', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
         "feature": ('#63b2ee', '#76da91', '#f8cb7f', '#f89588', '#7cd6cf', '#9192ab', '#7898e1', '#efa666', '#eddd86', '#9987ce', '#63b2ee', '#76da91'),
-        # 渐变
         "gradient": ('#71ae46', '#96b744', '#c4cc38', '#ebe12a', '#eab026', '#e3852b', '#d85d2a', '#ce2626', '#ac2026', '#71ae46', '#96b744', '#c4cc38'),
-        # 清新
+      
         "fresh": ('#00a8e1', '#99cc00', '#e30039', '#fcd300', '#800080', '#00994e', '#ff6600', '#808000', '#db00c2', '#008080', '#0000ff', '#c8cc00'),
-        # 怀旧
+        
         "nostalgic": ('#3b6291', '#943c39', '#779043', '#624c7c', '#388498', '#bf7334', '#3f6899', '#9c403d', '#7d9847', '#675083', '#3b8ba1', '#c97937'),
-        # 商务
+        #
         "business": ('#194f97', '#555555', '#bd6b08', '#00686b', '#c82d31', '#625ba1', '#898989', '#9c9800', '#007f54', '#a195c5', '#103667', '#f19272'),
-        # 明亮
+        
         "bright": ('#0e72cc', '#6ca30f', '#f59311', '#fa4343', '#16afcc', '#85c021', '#d12a6a', '#0e72cc', '#6ca30f', '#f59311', '#fa4343', '#16afcc'),
-        # 雅致
+        
         "elegant": ('#3682be', '#45a776', '#f05326', '#eed777', '#334f65', '#b3974e', '#38cb7d', '#ddae33', '#844bb3', '#93c555', '#5f6694', '#df3881'),
-        # 柔和
+        
         "soft": ('#5b9bd5', '#ed7d31', '#70ad47', '#ffc000', '#4472c4', '#91d024', '#b235e6', '#02ae75'),
-        # 淡雅
+        
         "subtle": ('#95a2ff', '#fa8080', '#ffc076', '#fae768', '#87e885', '#3cb9fc', '#73abf5', '#cb9bff', '#434348', '#90ed7d', '#f7a35c', '#8085e9'),
-        # 经典
+        
         "classic": ('#002c53', '#ffa510', '#0c84c6', '#ffbd66', '#f74d4d', '#2455a4', '#41b7ac'),
-        # 艳丽
+        
         "gorgeous": ('#fa2c7b', '#ff38e0', '#ffa235', '#04c5f3', '#0066fe', '#8932a5', '#c90444', '#cb9bff', '#434348', '#90ed7d', '#f7a35c', '#8085e9'),
-        # 科技
+        
         "technological": ('#05f8d6', '#0082fc', '#fdd845', '#22ed7c', '#09b0d3', '#1d27c9', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 炫彩1
+        
         "vibrant1": ('#e75840', '#a565ef', '#628cee', '#eb9358', '#d05c7c', '#bb60b2', '#433e7c', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 炫彩2
+        
         "vibrant2": ('#ef4464', '#fad259', '#d22e8d', '#03dee0', '#d05c7c', '#bb60b2', '#433e7c', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 简洁1
+        
         "minimal1": ('#929fff', '#9de0ff', '#ffa897', '#af87fe', '#7dc3fe', '#bb60b2', '#433e7c', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 简洁2
+        
         "minimal2": ('#50c48f', '#26ccd8', '#3685fe', '#9977ef', '#f5616f', '#f7b13f', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 冷色1
         "cool1": ('#bf19ff', '#854cff', '#5f45ff', '#02cdff', '#0090ff', '#314976', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 冷色2
         "cool2": ('#45c8dc', '#854cff', '#5f45ff', '#47aee3', '#d5d6d8', '#96d7f9', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'),
-        # 暖色
+
         "warm": ('#9489fa', '#f06464', '#f7af59', '#f0da49', '#71c16f', '#2aaaef', '#5690dd', '#bd88f5', '#009db2', '#024b51', '#0780cf', '#765005'),
     }
 )
@@ -143,7 +139,7 @@ def flow_get_color_generator(
         return _my_color_map_generator[name]
 
 
-# X的第1列、2列、3列和4列分别是ox，oy，dx，dy
+# X's first column, second column, third column, and fourth column are ox, oy, dx, dy
 def flow_draw(OD: np.ndarray, fig=None, ax=None, color: str = 'red', subplots_kwargs: Optional[dict] = None, **arrowprops_kwargs) -> tuple:
     """
     Draw flow visualization on a given figure and axis.
@@ -329,7 +325,7 @@ def flow_draw_cluster_fp_fn_error_by_lines(
     real_label = np.asarray(real_label, dtype=int)
     pred_label = np.asarray(pred_label, dtype=int)
 
-    # 避免修改原始参数
+    # Avoid modifying original parameters
     fn_line_kwargs = fn_line_kwargs.copy()
     fp_line_kwargs = fp_line_kwargs.copy()
 
@@ -341,25 +337,25 @@ def flow_draw_cluster_fp_fn_error_by_lines(
     if draw_cluster_with_label_kwargs is None:
         draw_cluster_with_label_kwargs = {}
 
-    # 利用技巧赋值为-2和-3
+    # Use trick to assign -2 and -3
     if fn_idx.size > 0:
         n_pred_lab[fn_idx] = -2
     if fp_idx.size > 0:
         n_pred_lab[fp_idx] = -3
 
-    # 然后绘制
+    # Then draw
     fig, ax = flow_draw_cluster_with_labels(
         OD, n_pred_lab, **draw_cluster_with_label_kwargs)
 
-    # 然后取出流来绘制
+    # Then extract flows to draw
     line_x, line_y = OD[0][0:2]
     if fn_idx.size > 0:
-        # 首先绘制一条线
+        # First draw a line
         OD_FN = OD[fn_idx, :]
         ax.plot([line_x], [line_y], **fn_line_kwargs)
         fn_line_kwargs.pop('label')
 
-        # 然后绘制流
+        # Then draw flows
         flow_draw(OD_FN, fig=fig, ax=ax, **fn_line_kwargs)
 
     if fp_idx.size > 0:
@@ -387,7 +383,7 @@ def flow_draw_cluster_fp_fn_error_by_lines2(
     real_label = np.asarray(real_label, dtype=int)
     pred_label = np.asarray(pred_label, dtype=int)
 
-    # 避免修改原始参数
+    # Avoid modifying original parameters
     fn_line_kwargs = fn_line_kwargs.copy()
     fp_line_kwargs = fp_line_kwargs.copy()
 
@@ -398,46 +394,45 @@ def flow_draw_cluster_fp_fn_error_by_lines2(
     if draw_cluster_with_label_kwargs is None:
         draw_cluster_with_label_kwargs = {}
 
-    # 然后绘制所有的流
+    # Then draw all flows
     fig, ax = flow_draw_cluster_with_labels(
         OD, pred_label, **draw_cluster_with_label_kwargs)
 
-    # 然后取出流来绘制
+    # Then extract flows to draw
     if fn_idx.size > 0:
-        # 首先绘制一条线
+        # First draw a line
         OD_FN = OD[fn_idx, :]
 
-        # 然后绘制流
+        # Then draw flows
         # flow_draw(OD_FN, fig=fig, ax=ax, **fn_line_kwargs)
         newOD2 = flow_zoom_out(OD_FN, 0.7)
-        # 提取起点和终点的坐标
+        # Extract start and end coordinates
         x_coords = newOD2[:, [0, 2]]
         y_coords = newOD2[:, [1, 3]]
 
-        # 创建一个绘图
-        # 使用批量绘图的方法绘制所有的线段
+        # Create a plot
+        # Use batch plotting method to draw all line segments
         ax.plot(x_coords.T, y_coords.T, **fn_line_kwargs)
 
     if fp_idx.size > 0:
         OD_FP = OD[fp_idx, :]
         newOD2 = flow_zoom_out(OD_FP, 0.7)
-        # 提取起点和终点的坐标
+        # Extract start and end coordinates
         x_coords = newOD2[:, [0, 2]]
         y_coords = newOD2[:, [1, 3]]
 
-        # 创建一个绘图
-        # 使用批量绘图的方法绘制所有的线段
+        # Create a plot
+        # Use batch plotting method to draw all line segments
         ax.plot(x_coords.T, y_coords.T, **fp_line_kwargs)
-        # print("?????")
 
-    # 画小图
+    # Draw inset
     if draw_inset:
-        # 画C1和C2
+        # Draw C1 and C2
         curgen = itertools.cycle(_my_color_map["feature"])
         new_ax = inset_axes(ax, width="30%", height="30%", loc='lower left',
                             bbox_to_anchor=(-0.01, -0.01, 1, 1), bbox_transform=ax.transAxes)
         indices = np.where((real_label == 0) | (real_label == 1))[0]
-        # 把FP FN也找一找
+        # Find FP and FN
         newOD = OD[indices]
         fp_fn_lst = fp_idx.tolist() + fn_idx.tolist()
         indices = indices.tolist()
@@ -461,20 +456,20 @@ def flow_draw_cluster_fp_fn_error_by_lines2(
         flow_draw_cluster_fp_fn_error_by_lines2(newOD, new_reallabel, new_predlabel, draw_cluster_with_label_kwargs=draw_cluster_with_label_kwargs,
                                                 fn_line_kwargs=fn_line_kwargs, fp_line_kwargs=fp_line_kwargs, draw_inset=False)
         for spine in new_ax.spines.values():
-            spine.set_linewidth(0.5)  # 粗细，可以根据需要调整
+            spine.set_linewidth(0.5)  # Thickness, adjust as needed
             pass
-        new_ax.patch.set_alpha(0.5)  # 设置透明
+        new_ax.patch.set_alpha(0.5)  # Set transparency
 
         count_0_1 = np.unique(new_predlabel).size
 
-        # 再来一次
+        # Do it again
         curgen = itertools.cycle(_my_color_map["feature"])
         for _ in range(count_0_1):
             next(curgen)
         new_ax = inset_axes(ax, width="30%", height="30%", loc='center right', bbox_to_anchor=(
             0.01, 0.05, 1, 1), bbox_transform=ax.transAxes)
         indices = np.where((real_label == 2) | (real_label == 3))[0]
-        # 把FP FN也找一找
+        # Find FP and FN
         newOD = OD[indices]
         fp_fn_lst = fp_idx.tolist() + fn_idx.tolist()
         indices = indices.tolist()
@@ -498,14 +493,12 @@ def flow_draw_cluster_fp_fn_error_by_lines2(
         flow_draw_cluster_fp_fn_error_by_lines2(newOD, new_reallabel, new_predlabel, draw_cluster_with_label_kwargs=draw_cluster_with_label_kwargs,
                                                 fn_line_kwargs=fn_line_kwargs, fp_line_kwargs=fp_line_kwargs, draw_inset=False)
         for spine in new_ax.spines.values():
-            spine.set_linewidth(0.5)  # 粗细，可以根据需要调整
+            spine.set_linewidth(0.5)  # Thickness, adjust as needed
             pass
-        new_ax.patch.set_alpha(0.5)  # 设置透明
+        new_ax.patch.set_alpha(0.5)  # Set transparency
 
-    # legend_kwargs={"loc":'upper center', "fancybox":True, "framealpha":0.5, "ncol": 2}
 # ******************************************* FLOW PLOT METHODS - END *******************************************
-# 返回figsize和每个axes的尺寸信息，即x,y, width, height
-# 返回figsize和每个axes的尺寸信息，即x,y, width, height
+# Return the figsize and size information for each axes, i.e., x, y, width, height
 
 
 def get_figsize_and_axes_sizeinfo(row_num=4, col_num=6, A4_width=6.05, height_width_ratio=1,
@@ -516,8 +509,8 @@ def get_figsize_and_axes_sizeinfo(row_num=4, col_num=6, A4_width=6.05, height_wi
                                   twofigs_width_margin=0.05,
                                   twofigs_height_margin=0.05) -> tuple[tuple[float, float], np.ndarray[tuple[float, float, float, float]]]:
     """return (figsize, size_info), figsize (tuple): (width, height), size_info(np.ndarray): (x, y, width, height)"""
-    # 整个大图的边缘
-    # 单位英寸
+    # The edge of the entire large image
+    # Unit inches
     width_size = (A4_width - right_margin - left_margin -
                   twofigs_width_margin * (col_num - 1)) / col_num
     height_size = width_size * height_width_ratio
@@ -527,13 +520,14 @@ def get_figsize_and_axes_sizeinfo(row_num=4, col_num=6, A4_width=6.05, height_wi
                row_num * height_size + bottom_margin + top_margin + (row_num - 1) * twofigs_height_margin)
 
     # 根据0,0计算出坐标的大小
+    # Calculate coordinate sizes based on 0,0
     def func(a, b): return ((left_margin + b * (width_size + twofigs_width_margin))/figsize[0],
                             (bottom_margin + (row_num - 1 - a) *
                              (height_size + twofigs_height_margin)) / figsize[1],
                             width_size / figsize[0],
                             height_size / figsize[1])
 
-    # 创建数组
+    # Create array
     # print(figsize)
     size_info = np.empty((row_num, col_num), dtype=object)
     for a in range(row_num):
@@ -552,12 +546,12 @@ def get_fig_and_axes_from_sizeinfo(figsize, *sizeinfo: np.ndarray) -> tuple[Figu
         cur_ax = fig.add_axes(x)
         axes.append(cur_ax)
         for spine in cur_ax.spines.values():
-            spine.set_linewidth(0.5)  # 粗细，可以根据需要调整
+            spine.set_linewidth(0.5)  # Thickness can be adjusted as needed
 
     return (fig, axes)
 
 
-# 返回的也是figsize，以及每个ax的sizeinfo
+# Returns figsize and sizeinfo for each axis
 def figsize_sizeinfo_vstack(figsize1, figsize2, axs1_sizeinfo: np.ndarray, axs2_sizeinfo: np.ndarray, merge_ax=False) -> tuple[tuple[float, float], np.ndarray[tuple], np.ndarray[tuple]]:
     fig1_width, fig1_height = figsize1
     fig2_width, fig2_height = figsize2
@@ -627,6 +621,7 @@ def figsize_sizeinfo_hstack(figsize1, figsize2, axs1_sizeinfo: np.ndarray, axs2_
 
 
 # 往两边延长
+# Extend in both directions
 def flow_extension(OD: np.ndarray, od_ex_len: float, do_ex_len: float, copy=True) -> np.ndarray:
     if copy:
         OD = np.copy(OD)
